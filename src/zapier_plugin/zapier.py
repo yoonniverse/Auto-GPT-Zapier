@@ -12,14 +12,12 @@ to use oauth. Review the full docs above and reach out to nla@zapier.com for
 developer support.
 """
 import json
+import os
 from typing import Dict, List, Optional
 
 import requests
 from pydantic import BaseModel, Extra, root_validator
 from requests import Request, Session
-
-from langchain.utils import get_from_dict_or_env
-
 
 class ZapierNLAWrapper(BaseModel):
     """Wrapper for Zapier NLA.
@@ -92,13 +90,7 @@ class ZapierNLAWrapper(BaseModel):
             values["zapier_nla_oauth_access_token"] = ""
 
         # we require at least one API Key
-        zapier_nla_api_key = get_from_dict_or_env(
-            values,
-            "zapier_nla_api_key",
-            "ZAPIER_NLA_API_KEY",
-            zapier_nla_api_key_default,
-        )
-
+        zapier_nla_api_key = os.getenv('ZAPIER_NLA_API_KEY')
         values["zapier_nla_api_key"] = zapier_nla_api_key
 
         return values
