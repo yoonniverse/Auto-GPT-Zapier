@@ -43,7 +43,7 @@ class ZapierPlugin(AutoGPTPluginTemplate):
             prompt.add_command(
                 action['description'],
                 '_'.join(action['operation_id'].split('_')[:-1]),
-                {k: k for k in action['params'].keys() if k != 'instructions'},
+                {k: f"<{k}>" for k in action['params'].keys() if k != 'instructions'},
                 job
             )
         return prompt

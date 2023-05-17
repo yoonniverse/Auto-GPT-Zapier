@@ -16,10 +16,9 @@ import os
 from typing import Dict, List, Optional
 
 import requests
-from pydantic import BaseModel, Extra, root_validator
 from requests import Request, Session
 
-class ZapierNLAWrapper(BaseModel):
+class ZapierNLAWrapper:
     """Wrapper for Zapier NLA.
 
     Full docs here: https://nla.zapier.com/api/v1/docs
@@ -34,14 +33,10 @@ class ZapierNLAWrapper(BaseModel):
     nla@zapier.com for developer support.
     """
 
-    zapier_nla_api_key: str
-    zapier_nla_oauth_access_token: str
-    zapier_nla_api_base: str = "https://nla.zapier.com/api/v1/"
-
-    class Config:
-        """Configuration for this pydantic object."""
-
-        extra = Extra.forbid
+    def __init__(self):
+        self.zapier_nla_api_key: str = os.getenv("ZAPIER_NLA_API_KEY")
+        self.zapier_nla_oauth_access_token: str = None
+        self.zapier_nla_api_base: str = "https://nla.zapier.com/api/v1/"
 
     def _get_session(self) -> Session:
         session = requests.Session()
@@ -75,25 +70,6 @@ class ZapierNLAWrapper(BaseModel):
             self.zapier_nla_api_base + f"exposed/{action_id}/execute/",
             json=data,
         )
-
-    @root_validator(pre=True)
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that api key exists in environment."""
-
-        zapier_nla_api_key_default = None
-
-        # If there is a oauth_access_key passed in the values
-        # we don't need a nla_api_key it can be blank
-        if "zapier_nla_oauth_access_token" in values:
-            zapier_nla_api_key_default = ""
-        else:
-            values["zapier_nla_oauth_access_token"] = ""
-
-        # we require at least one API Key
-        zapier_nla_api_key = os.getenv('ZAPIER_NLA_API_KEY')
-        values["zapier_nla_api_key"] = zapier_nla_api_key
-
-        return values
 
     def list(self) -> List[Dict]:
         """Returns a list of all exposed (enabled) actions associated with
@@ -132,9 +108,15 @@ class ZapierNLAWrapper(BaseModel):
         """
         session = self._get_session()
         request = self._get_action_request(action_id, instructions, params)
-        response = session.send(session.prepare_request(request))
-        response.raise_for_status()
-        return response.json()["result"]
+        try:
+            response = session.send(session.prepare_request(request))
+            response.raise_for_status()
+        except:
+            return "Error"
+        response = response.json()
+        if response['status'] == 'error':
+            return response['error']
+        return 'Success'
 
     def preview(
         self, action_id: str, instructions: str, params: Optional[Dict] = None
