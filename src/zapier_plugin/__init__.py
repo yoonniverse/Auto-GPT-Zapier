@@ -39,7 +39,7 @@ class ZapierPlugin(AutoGPTPluginTemplate):
         """
         def create_job(action_id):
             def job(**kwargs):
-                return zapier.run(action_id, params=kwargs)
+                return self.zapier.run(action_id, params=kwargs)
             return job
         for action in self.zapier.list():            
             job = create_job(action['id'])
