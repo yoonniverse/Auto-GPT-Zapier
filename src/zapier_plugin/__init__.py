@@ -37,9 +37,12 @@ class ZapierPlugin(AutoGPTPluginTemplate):
         Returns:
             PromptGenerator: The prompt generator.
         """
-        for action in self.zapier.list():            
+        def create_job(action_id):
             def job(**kwargs):
-                return self.zapier.run(action['id'], params=kwargs)
+                return zapier.run(action_id, params=kwargs)
+            return job
+        for action in self.zapier.list():            
+            job = create_job(action['id'])
             prompt.add_command(
                 action['description'],
                 '_'.join(action['operation_id'].split('_')[:-1]),

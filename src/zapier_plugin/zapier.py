@@ -108,15 +108,10 @@ class ZapierNLAWrapper:
         """
         session = self._get_session()
         request = self._get_action_request(action_id, instructions, params)
-        try:
-            response = session.send(session.prepare_request(request))
-            response.raise_for_status()
-        except:
-            return "Error"
+        response = session.send(session.prepare_request(request))
+        response.raise_for_status()
         response = response.json()
-        if response['status'] == 'error':
-            return response['error']
-        return 'Success'
+        return response['result']
 
     def preview(
         self, action_id: str, instructions: str, params: Optional[Dict] = None
