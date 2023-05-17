@@ -2,6 +2,22 @@
 
 See `demo.ipynb` for example usage.
 
+### Zapier Setup
+
+1. Sign up to Zapier
+2. Go to https://nla.zapier.com/get-started/, click `Manage Actions`, then click `Add a new action`
+   ![1](assets/1.png)
+3. Search for action then click `Connect new` to connect app.
+   ![2](assets/2.png)
+4. Click `Enable action`
+   ![3](assets/3.png)
+5. Copy personal api key and add it to `.env` file
+   ```
+   ZAPIER_NLA_API_KEY=sk-ak-...
+   ```
+   ![4](assets/4.png)
+
+
 ### Plugin Installation Steps
 
 1. **Clone or download the plugin repository:**
